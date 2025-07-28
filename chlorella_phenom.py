@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import os
 import cv2
 import numpy as np
@@ -13,9 +7,6 @@ from tqdm import tqdm
 from datetime import datetime
 
 
-# In[ ]:
-
-
 def setup_folders(output_folder):
     os.makedirs(output_folder, exist_ok=True)
     hist_dir = os.path.join(output_folder, "histograms")
@@ -23,32 +14,18 @@ def setup_folders(output_folder):
     return hist_dir  
 
 
-# In[ ]:
-
-
 def get_image_files(folder_path):
     return [f for f in os.listdir(folder_path) 
             if f.lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff', '.bmp'))]
 
 
-# In[ ]:
-
-
 def sample_pixels(img_array, step=5):
     return img_array[::step, ::step]
-
-
-# In[ ]:
-
 
 def analyze_colors(image_rgb, step=5):
     sampled_img = sample_pixels(image_rgb, step)
     r, g, b = cv2.split(sampled_img)
     return r, g, b
-
-
-# In[ ]:
-
 
 def preprocess_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -57,10 +34,6 @@ def preprocess_image(image):
     blurred = cv2.GaussianBlur(contrast_enhanced, (5,5), 0)
     _, binary = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     return binary
-
-
-# In[ ]:
-
 
 def segment_cells(image, binary_image):
     kernel = np.ones((3,3), np.uint8)
@@ -78,9 +51,6 @@ def segment_cells(image, binary_image):
     
     markers = cv2.watershed(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), markers)
     return markers
-
-
-# In[ ]:
 
 
 def count_and_filter(image, markers, min_size=30, max_size=1000):
@@ -107,17 +77,11 @@ def count_and_filter(image, markers, min_size=30, max_size=1000):
     return counts, areas
 
 
-# In[ ]:
-
-
 def detect_background(image, threshold=30):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (15,15), 0)
     _, bg_mask = cv2.threshold(blurred, threshold, 255, cv2.THRESH_BINARY_INV)
     return bg_mask
-
-
-# In[ ]:
 
 
 def process_single_image(image_path, step=5):
@@ -162,10 +126,6 @@ def process_single_image(image_path, step=5):
         print(f"Ошибка при обработке {filename}: {str(e)}")
         return None, None, None, None, None
 
-
-# In[ ]:
-
-
 def save_histograms(all_r, all_g, all_b, hist_dir):
     plt.figure(figsize=(15, 5))
     plt.subplot(131)
@@ -193,10 +153,6 @@ def save_histograms(all_r, all_g, all_b, hist_dir):
     plt.savefig(hist_path)
     plt.close()
     return hist_path
-
-
-# In[ ]:
-
 
 def main():
     input_folder = input("Enter the name of the input data folder: ")
@@ -248,10 +204,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# In[ ]:
-
-
-get_ipython().system('jupyter nbconvert --to python имя_вашего_файла.ipynb')
-
